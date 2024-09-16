@@ -7,4 +7,4 @@
 #SBATCH --output=%j.out
 
 
-taskset -c 0-7 ./prefixsum_omp.exe 100000000 10 8
+taskset -c 4-7,36-39 ./prefixsum_omp.exe 100000000 10 8
