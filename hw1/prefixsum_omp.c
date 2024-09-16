@@ -38,6 +38,26 @@ inline suseconds_t usec(struct timeval start, struct timeval end)
                      (start.tv_sec * 1000000 + start.tv_usec))));
 }
 
+double calculate_standard_deviation(suseconds_t *data, int n) {
+    double mean = 0.0;
+    double variance = 0.0;
+    double std_dev = 0.0;
+
+    for (int i = 0; i < n; i++) {
+        mean += (double)data[i];
+    }
+    mean /= n;
+
+    for (int i = 0; i < n; i++) {
+        variance += (data[i] - mean) * (data[i] - mean);
+    }
+    variance /= n;
+
+    std_dev = sqrt(variance);
+
+    return std_dev;
+}
+
 int main(int argc, char *argv[])
 {
     int num_elems = 0;
@@ -160,6 +180,8 @@ int main(int argc, char *argv[])
 
     suseconds_t iter_usec = 0;
     suseconds_t total_usec = 0;
+    suseconds_t *usecs;
+    usecs = (suseconds_t *)malloc(sizeof(suseconds_t) * 10);
     int iter;
     for (iter = 0; iter < num_iters; iter++) {
         // copy the input array to the prefix sum array for initialization
@@ -179,7 +201,32 @@ int main(int argc, char *argv[])
         /************************************************************/
         /* PLEASE COMPLETE THE CODE - Begin                         */
         /************************************************************/
+        #pragma omp parallel shared(starts, ends, prefix_sums, tmp_sums, num_threads)
+        {
+            int tid = omp_get_thread_num(); // get the local thread ID
+            int start = starts[tid];
+            int end = ends[tid];
+            int i;
+            for (i = start+1; i < end; i++)
+                prefix_sums[i] += prefix_sums[i-1];
+            if (tid != num_threads - 1) {
+                tmp_sums[tid+1] = prefix_sums[end-1];
+            }
+        }
+        #pragma omp barrier
+        for (int ii = 1; ii < num_threads; ii++) {
+            tmp_sums[ii] += tmp_sums[ii-1];
+        }
 
+        #pragma omp parallel shared(starts, ends, prefix_sums, tmp_sums)
+        {
+            int tid = omp_get_thread_num(); // get the local thread ID
+            int start = starts[tid];
+            int end = ends[tid];
+            int i;
+            for (i = start; i < end; i++)
+                prefix_sums[i] += tmp_sums[tid];
+        }
         /************************************************************/
         /* PLEASE COMPLETE THE CODE - End                           */
         /************************************************************/
@@ -187,6 +234,7 @@ int main(int argc, char *argv[])
 
         iter_usec = usec(start_time, end_time);
         total_usec += iter_usec;
+        usecs[iter] = iter_usec;
 
         printf("iteration %d elapsed time: %d (usec)\n", iter, iter_usec);
         fprintf(fp, "iteration %d elapsed time: %d (usec)\n", iter, iter_usec);
@@ -199,6 +247,12 @@ int main(int argc, char *argv[])
             total_usec / num_iters);
     fprintf(fp, "Prefix Sum average elapsed time: %d (usec)\n",
             total_usec / num_iters);
+
+    double std_dev = calculate_standard_deviation(usecs, 10);
+    printf("Prefix Sum std: %f (std_dev)\n",
+            std_dev);
+    fprintf(fp, "Prefix Sum std: %f (std_dev)\n",
+            std_dev);
 
 #ifdef PRINT_PREFIXSUM
     fprintf(fp, "\nInputs:");

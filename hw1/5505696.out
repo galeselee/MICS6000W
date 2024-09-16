@@ -1,0 +1,18 @@
+Command line: ./prefixsum_omp.exe 100000000 10 4
+Stats file: prefixsum_omp_100000000elems_10iters_4threads.txt
+
+Start ...
+iteration 0 elapsed time: 45499 (usec)
+iteration 1 elapsed time: 45449 (usec)
+iteration 2 elapsed time: 45411 (usec)
+iteration 3 elapsed time: 45438 (usec)
+iteration 4 elapsed time: 45396 (usec)
+iteration 5 elapsed time: 45404 (usec)
+iteration 6 elapsed time: 45446 (usec)
+iteration 7 elapsed time: 75203 (usec)
+iteration 8 elapsed time: 45455 (usec)
+iteration 9 elapsed time: 45388 (usec)
+Finish OpenMP Parrallel Prefix Sum calculation
+
+Prefix Sum average elapsed time: 48408 (usec)
+Prefix Sum std: 8931.422624 (std_dev)
