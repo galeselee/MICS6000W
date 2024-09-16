@@ -6,13 +6,7 @@ LIB    = -lm     # link libraries
 
 default: all
 
-all: prefixsum_omp.exe prefixsum_mpi.exe prefixsum_seq.exe
-
-prefixsum_omp.exe: prefixsum_omp.c
-	$(CC) $(CFLAGS) $(DFLAGS) $(LIB) -fopenmp -o $@ $<
-
-prefixsum_mpi.exe: prefixsum_mpi.c
-	$(MPICC) $(CFLAGS) $(DFLAGS) $(LIB) -o $@ $<
+all: prefixsum_seq.exe
 
 prefixsum_seq.exe: prefixsum_seq.c
 	$(CC) $(CFLAGS) $(DFLAGS) $(LIB) -o $@ $<

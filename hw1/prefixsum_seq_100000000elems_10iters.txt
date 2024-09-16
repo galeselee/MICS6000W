@@ -1,0 +1,18 @@
+Command line: ./prefixsum_seq.exe 100000000 10
+Stats file: prefixsum_seq_100000000elems_10iters.txt
+
+Start ...
+iteration 0 elapsed time: 110053 (usec)
+iteration 1 elapsed time: 112381 (usec)
+iteration 2 elapsed time: 110943 (usec)
+iteration 3 elapsed time: 106827 (usec)
+iteration 4 elapsed time: 110134 (usec)
+iteration 5 elapsed time: 110121 (usec)
+iteration 6 elapsed time: 118929 (usec)
+iteration 7 elapsed time: 109703 (usec)
+iteration 8 elapsed time: 115760 (usec)
+iteration 9 elapsed time: 107533 (usec)
+Finish Prefix Sum calculation
+
+Prefix Sum average elapsed time: 111238 (usec)
+Prefix Sum std: 3469.932829 (std_dev)

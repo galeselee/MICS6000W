@@ -7,4 +7,4 @@
 #SBATCH --output=%j.out
 
 
-tastset -c 0 ./prefixsum_seq.exe 100000000 10
+./prefixsum_seq.exe 100000000 10

@@ -18,6 +18,7 @@
 #include <math.h>
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <math.h>
 
 #define MAX_INT 2147483647
 //#define PRINT_PREFIXSUM
@@ -27,6 +28,26 @@ inline suseconds_t usec(struct timeval start, struct timeval end)
 {
   return ((double) (((end.tv_sec * 1000000 + end.tv_usec) -
                      (start.tv_sec * 1000000 + start.tv_usec))));
+}
+
+double calculate_standard_deviation(suseconds_t *data, int n) {
+    double mean = 0.0;
+    double variance = 0.0;
+    double std_dev = 0.0;
+
+    for (int i = 0; i < n; i++) {
+        mean += (double)data[i];
+    }
+    mean /= n;
+
+    for (int i = 0; i < n; i++) {
+        variance += (data[i] - mean) * (data[i] - mean);
+    }
+    variance /= n;
+
+    std_dev = sqrt(variance);
+
+    return std_dev;
 }
 
 int main(int argc, char *argv[])
@@ -90,6 +111,8 @@ int main(int argc, char *argv[])
 
     suseconds_t iter_usec = 0;
     suseconds_t total_usec = 0;
+    suseconds_t *usecs;
+    usecs = (suseconds_t *)malloc(sizeof(suseconds_t) * 10);
     int iter;
     for (iter = 0; iter < num_iters; iter++) {
 
@@ -111,6 +134,7 @@ int main(int argc, char *argv[])
 
         iter_usec = usec(start, end);
         total_usec += iter_usec;
+        usecs[iter] = iter_usec;
 
         printf("iteration %d elapsed time: %d (usec)\n", iter, iter_usec);
         fprintf(fp, "iteration %d elapsed time: %d (usec)\n", iter, iter_usec);
@@ -123,6 +147,12 @@ int main(int argc, char *argv[])
             total_usec / num_iters);
     fprintf(fp, "Prefix Sum average elapsed time: %d (usec)\n",
             total_usec / num_iters);
+
+    double std_dev = calculate_standard_deviation(usecs, 10);
+    printf("Prefix Sum std: %f (std_dev)\n",
+            std_dev);
+    fprintf(fp, "Prefix Sum std: %f (std_dev)\n",
+            std_dev);
 
 #ifdef PRINT_PREFIXSUM
     fprintf(fp, "\nInputs:");
