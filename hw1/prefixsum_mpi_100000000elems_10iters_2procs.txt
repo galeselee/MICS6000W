@@ -1,0 +1,18 @@
+Command line: mpirun -np 2 ./prefixsum_mpi.exe 100000000 10
+Stats file: prefixsum_mpi_100000000elems_10iters_2procs.txt
+
+Start ...
+iteration 0 elapsed time: 72399 (usec)
+iteration 1 elapsed time: 72425 (usec)
+iteration 2 elapsed time: 72534 (usec)
+iteration 3 elapsed time: 72322 (usec)
+iteration 4 elapsed time: 72204 (usec)
+iteration 5 elapsed time: 72284 (usec)
+iteration 6 elapsed time: 72673 (usec)
+iteration 7 elapsed time: 72267 (usec)
+iteration 8 elapsed time: 72159 (usec)
+iteration 9 elapsed time: 72112 (usec)
+Finish MPI Parallel Prefix Sum calculation
+
+Prefix Sum average elapsed time: 72337 (usec)
+Prefix Sum std: 164.686642 (std_dev)

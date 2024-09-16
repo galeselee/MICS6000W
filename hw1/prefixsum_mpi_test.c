@@ -1,3 +1,7 @@
+// mpi.slurm.test
+// mpicc prefixsum_mpi_test.c -o mpi_test -DPRINT_PREFIXSUM -lm -O3
+// mpirun -n 8 ./mpi_test 80 1
+
 /*
  * prefixsum_mpi.c
  *
@@ -36,26 +40,6 @@ inline suseconds_t usec(struct timeval start, struct timeval end)
                      (start.tv_sec * 1000000 + start.tv_usec))));
 }
 
-double calculate_standard_deviation(suseconds_t *data, int n) {
-    double mean = 0.0;
-    double variance = 0.0;
-    double std_dev = 0.0;
-
-    for (int i = 0; i < n; i++) {
-        mean += (double)data[i];
-    }
-    mean /= n;
-
-    for (int i = 0; i < n; i++) {
-        variance += (data[i] - mean) * (data[i] - mean);
-    }
-    variance /= n;
-
-    std_dev = sqrt(variance);
-
-    return std_dev;
-}
-
 int main(int argc, char *argv[])
 {
     // command line arguments
@@ -75,8 +59,6 @@ int main(int argc, char *argv[])
     struct timeval start_time, end_time;  // for gettimeofday to calculate timing
 
     MPI_Status status; // status variable for MPI operations
-    MPI_Request request;
-
 
     // Initialize MPI environment
     // - num_procs instances of this program will be initiated by MPI.
@@ -182,7 +164,8 @@ int main(int argc, char *argv[])
     int i;
     int K = MAX_INT / num_elems;
     for (i = 0; i < my_num_elems; i++) {
-        local_data[i] = rand() % K;
+        // local_data[i] = rand() % K;
+         local_data[i] = 1;
     }
 
     MPI_Barrier(MPI_COMM_WORLD);    // Global barrier
@@ -195,8 +178,6 @@ int main(int argc, char *argv[])
 
     suseconds_t iter_usec = 0;
     suseconds_t total_usec = 0;
-    suseconds_t *usecs;
-    usecs = (suseconds_t *)malloc(sizeof(suseconds_t) * 10);
 
     int iter;
     for (iter = 0; iter < num_iters; iter++) {
@@ -222,13 +203,12 @@ int main(int argc, char *argv[])
         }
 
         if (rank != num_procs - 1) {
-            MPI_Isend(buffer_update, 1, MPI_LONG, rank + 1, 0, MPI_COMM_WORLD, &request);
+            MPI_Send(buffer_update, 1, MPI_LONG, rank + 1, 0, MPI_COMM_WORLD);
         }
         for (int ii = 0; ii < my_num_elems; ii++) {
             local_prefix_sums[ii] += buffer[0];
         }
 
-        MPI_Barrier(MPI_COMM_WORLD);
         /************************************************************/
         /* PLEASE COMPLETE THE CODE - End                           */
         /************************************************************/
@@ -236,7 +216,6 @@ int main(int argc, char *argv[])
 
         iter_usec = usec(start_time, end_time);
         total_usec += iter_usec;
-        usecs[iter] = iter_usec;
 
         if (rank == 0) {
             printf("iteration %d elapsed time: %d (usec)\n", iter, iter_usec);
@@ -254,11 +233,6 @@ int main(int argc, char *argv[])
         fprintf(fp, "Prefix Sum average elapsed time: %d (usec)\n",
                 total_usec / num_iters);
 
-    double std_dev = calculate_standard_deviation(usecs, 10);
-    printf("Prefix Sum std: %f (std_dev)\n",
-            std_dev);
-    fprintf(fp, "Prefix Sum std: %f (std_dev)\n",
-            std_dev);
 #ifdef PRINT_PREFIXSUM
         fprintf(fp, "\nInputs:");
 #endif // #ifdef PRINT_PREFIXSUM
